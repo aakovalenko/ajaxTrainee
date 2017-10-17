@@ -16,19 +16,18 @@
   // extract $id
   $raw_id = isset($_POST['id']) ? $_POST['id'] : '';
 
-  if (preg_match("/blog-post-(\d+)/", $raw_id, $matches)) {
+  if(preg_match("/blog-post-(\d+)/", $raw_id, $matches)) {
     $id = $matches[1];
 
-      // store in $_SESSION['favorites']
-      if (!in_array($id, $_SESSION['favorites'])) {
-        $_SESSION['favorite'][] = $id;
-      }
+    // store in $_SESSION['favorites']
+    if(!in_array($id, $_SESSION['favorites'])) {
+      $_SESSION['favorites'][] = $id;
+    }
 
-      echo 'true';
-      // return true/false
+    echo 'true';
   } else {
     echo 'false';
   }
-  
+
 
 ?>
