@@ -32,6 +32,7 @@
     </style>
   </head>
   <body>
+      
     <div id="blog-posts">
       <div id="blog-post-101" class="blog-post">
         <h3>Blog Post 101</h3>
@@ -52,16 +53,14 @@
 
     <script>
       function favorite() {
-          var parent = this.parentElement;
+        var parent = this.parentElement;
 
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'favorite.php', true);
-
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
         xhr.onreadystatechange = function () {
-
           if(xhr.readyState == 4 && xhr.status == 200) {
             var result = xhr.responseText;
             console.log('Result: ' + result);
