@@ -10,9 +10,9 @@
       .error {
         border: 1px solid red;
       }
-        #spinner {
-            display: none;
-        }
+      #spinner {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -32,7 +32,7 @@
     </div>
 
     <div id="spinner">
-        <img src="spinner.gif" width="50" height="50"/>
+      <img src="spinner.gif" width="50" height="50" />
     </div>
 
     <div id="result">
@@ -43,15 +43,30 @@
 
       var result_div = document.getElementById("result");
       var volume = document.getElementById("volume");
+      var button = document.getElementById("ajax-submit");
+      var orig_button_value = button.value;
 
       function showSpinner() {
-          var spinner = document.getElementById("spinner");
-          spinner.style.display = 'block';
+        var spinner = document.getElementById("spinner");
+        spinner.style.display = 'block';
       }
 
       function hideSpinner() {
-          var spinner = document.getElementById("spinner");
-          spinner.style.display = 'none';
+        var spinner = document.getElementById("spinner");
+        spinner.style.display = 'none';
+      }
+
+
+      function disableSubmitButton() {
+
+          button.disabled = true;
+          button.value = 'Loading...';
+      }
+
+      function enableSubmitButton() {
+
+          button.disabled = false;
+          button.value = orig_button_value;
       }
 
       function displayErrors(errors) {
@@ -96,6 +111,10 @@
         clearResult();
         clearErrors();
         showSpinner();
+        disableSubmitButton();
+
+
+          button.disabled = true;
 
         var form = document.getElementById("measurement-form");
         var action = form.getAttribute("action");
@@ -117,6 +136,7 @@
             console.log('Result: ' + result);
 
             hideSpinner();
+            enableSubmitButton();
 
             var json = JSON.parse(result);
             if(json.hasOwnProperty('errors') && json.errors.length > 0) {
@@ -129,7 +149,7 @@
         xhr.send(form_data);
       }
 
-      var button = document.getElementById("ajax-submit");
+
       button.addEventListener("click", calculateMeasurements);
 
     </script>
