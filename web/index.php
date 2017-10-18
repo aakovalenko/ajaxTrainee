@@ -1,135 +1,90 @@
-<?php
-  session_start();
-
-  if(!isset($_SESSION['favorites'])) { $_SESSION['favorites'] = []; }
-
-  function is_favorite($id) {
-    return in_array($id, $_SESSION['favorites']);
-  }
-
-?>
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Asynchronous Button</title>
+    <title>Asynchronous Form</title>
     <style>
-      #blog-posts {
-        width: 700px;
-      }
-      .blog-post {
-        border: 1px solid black;
-        margin: 10px 10px 20px 10px;
-        padding: 6px 10px;
-      }
-
-      button.favorite-button, button.unfavorite-button {
-        background: #0000FF;
-        color: white;
-        text-align: center;
-        width: 70px;
-      }
-      button.favorite-button:hover, button.unfavorite-button:hover {
-        background: #000099;
-      }
-
-      button.favorite-button {
-        display: inline;
-      }
-      .favorite button.favorite-button {
+      #result {
         display: none;
-      }
-      button.unfavorite-button {
-        display: none;
-      }
-      .favorite button.unfavorite-button {
-        display: inline;
-      }
-
-      .favorite-heart {
-        color: red;
-        font-size: 2em;
-        float: right;
-        display: none;
-      }
-      .favorite .favorite-heart {
-        display: block;
       }
     </style>
   </head>
   <body>
-    <div id="blog-posts">
-      <div id="blog-post-101" class="blog-post <?php if(is_favorite(101)) { echo 'favorite'; } ?>">
-        <span class="favorite-heart">&hearts;</span>
-        <h3>Blog Post 101</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed scelerisque nunc malesuada mauris fermentum commodo. Integer non pellentesque augue, vitae pellentesque tortor. Ut gravida ullamcorper dolor, ac fringilla mauris interdum id. Nulla porta egestas nisi, et eleifend nisl tincidunt suscipit. Suspendisse massa ex, fringilla quis orci a, rhoncus porta nulla. Aliquam diam velit, bibendum sit amet suscipit eget, mollis in purus. Sed mattis ultricies scelerisque. Integer ligula magna, feugiat non purus eget, pharetra volutpat orci. Duis gravida neque erat, nec venenatis dui dictum vel. Maecenas molestie tortor nec justo porttitor, in sagittis libero consequat. Maecenas finibus porttitor nisl vitae tincidunt.</p>
-        <button class="favorite-button">Favorite</button>
-        <button class="unfavorite-button">Unfavorite</button>
-      </div>
-      <div id="blog-post-102" class="blog-post <?php if(is_favorite(102)) { echo 'favorite'; } ?>">
-        <span class="favorite-heart">&hearts;</span>
-        <h3>Blog Post 102</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed scelerisque nunc malesuada mauris fermentum commodo. Integer non pellentesque augue, vitae pellentesque tortor. Ut gravida ullamcorper dolor, ac fringilla mauris interdum id. Nulla porta egestas nisi, et eleifend nisl tincidunt suscipit. Suspendisse massa ex, fringilla quis orci a, rhoncus porta nulla. Aliquam diam velit, bibendum sit amet suscipit eget, mollis in purus. Sed mattis ultricies scelerisque. Integer ligula magna, feugiat non purus eget, pharetra volutpat orci. Duis gravida neque erat, nec venenatis dui dictum vel. Maecenas molestie tortor nec justo porttitor, in sagittis libero consequat. Maecenas finibus porttitor nisl vitae tincidunt.</p>
-        <button class="favorite-button">Favorite</button>
-        <button class="unfavorite-button">Unfavorite</button>
-      </div>
-      <div id="blog-post-103" class="blog-post <?php if(is_favorite(103)) { echo 'favorite'; } ?>">
-        <span class="favorite-heart">&hearts;</span>
-        <h3>Blog Post 103</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed scelerisque nunc malesuada mauris fermentum commodo. Integer non pellentesque augue, vitae pellentesque tortor. Ut gravida ullamcorper dolor, ac fringilla mauris interdum id. Nulla porta egestas nisi, et eleifend nisl tincidunt suscipit. Suspendisse massa ex, fringilla quis orci a, rhoncus porta nulla. Aliquam diam velit, bibendum sit amet suscipit eget, mollis in purus. Sed mattis ultricies scelerisque. Integer ligula magna, feugiat non purus eget, pharetra volutpat orci. Duis gravida neque erat, nec venenatis dui dictum vel. Maecenas molestie tortor nec justo porttitor, in sagittis libero consequat. Maecenas finibus porttitor nisl vitae tincidunt.</p>
-        <button class="favorite-button">Favorite</button>
-        <button class="unfavorite-button">Unfavorite</button>
-      </div>
+
+    <div id="measurements">
+      <p>Enter measurements below to determine the total volume.</p>
+      <form id="measurement-form" action="process_measurements.php" method="POST">
+        Length: <input type="text" name="length" /><br />
+        <br />
+        Width: <input type="text" name="width" /><br />
+        <br />
+        Height: <input type="text" name="height" /><br />
+        <br />
+        <input id="html-submit" type="submit" value="Submit" />
+        <input id="ajax-submit" type="button" value="Ajax Submit" />
+      </form>
+    </div>
+
+    <div id="result">
+      <p>The total volume is: <span id="volume"></span></p>
     </div>
 
     <script>
-      function favorite() {
-        var parent = this.parentElement;
+
+      var result_div = document.getElementById("result");
+      var volume = document.getElementById("volume");
+
+      function postResult(value) {
+        volume.innerHTML = value;
+        result_div.style.display = 'block';
+      }
+
+      function clearResult() {
+        volume.innerHTML = '';
+        result_div.style.display = 'none';
+      }
+
+      function gatherFormData(form) {
+          var inputs = form.getElementsByTagName('input');
+          var array = [];
+          for (i=0; i < inputs.length; i++) {
+              var inputNameValue = inputs[i].name + '=' + inputs[i].value;
+              array.push(inputNameValue);
+          }
+          return array.join('&');
+      }
+
+      function calculateMeasurements() {
+        clearResult();
+
+        var form = document.getElementById("measurement-form");
+        var action = form.getAttribute("action");
+
+        var form_data = new FormData(form);
+        for ([key,value] of form_data.entries()){
+            console.log(key + ': ' + value);
+        }
+
+        // gather form data
 
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'favorite.php', true);
-        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.open('POST', action, true);
+        // do not set content-type with FormData
+        //xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.onreadystatechange = function () {
           if(xhr.readyState == 4 && xhr.status == 200) {
             var result = xhr.responseText;
             console.log('Result: ' + result);
-            if(result == 'true') {
-              parent.classList.add("favorite");
-            }
+            postResult(result);
           }
         };
-        xhr.send("id=" + parent.id);
+        xhr.send(form_data);
       }
 
-      var buttons = document.getElementsByClassName("favorite-button");
-      for(i=0; i < buttons.length; i++) {
-        buttons.item(i).addEventListener("click", favorite);
-      }
+      var button = document.getElementById("ajax-submit");
+      button.addEventListener("click", calculateMeasurements);
 
-      function unfavorite() {
-        var parent = this.parentElement;
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'unfavorite.php', true);
-        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.onreadystatechange = function () {
-          if(xhr.readyState == 4 && xhr.status == 200) {
-            var result = xhr.responseText;
-            console.log('Result: ' + result);
-            if(result == 'true') {
-              parent.classList.remove("favorite");
-            }
-          }
-        };
-        xhr.send("id=" + parent.id);
-      }
-
-      var buttons = document.getElementsByClassName("unfavorite-button");
-      for(i=0; i < buttons.length; i++) {
-        buttons.item(i).addEventListener("click", unfavorite);
-      }
     </script>
 
   </body>
