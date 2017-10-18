@@ -2,13 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Asynchronous Form</title>
+    <title>Infinite Scroll</title>
     <style>
-      #result {
-        display: none;
+      #blog-posts {
+        width: 700px;
       }
-      .error {
-        border: 1px solid red;
+      .blog-post {
+        border: 1px solid black;
+        margin: 10px 10px 20px 10px;
+        padding: 6px 10px;
       }
       #spinner {
         display: none;
@@ -16,34 +18,33 @@
     </style>
   </head>
   <body>
-
-    <div id="measurements">
-      <p>Enter measurements below to determine the total volume.</p>
-      <form id="measurement-form" action="process_measurements.php" method="POST">
-        Length: <input type="text" name="length" /><br />
-        <br />
-        Width: <input type="text" name="width" /><br />
-        <br />
-        Height: <input type="text" name="height" /><br />
-        <br />
-        <input id="html-submit" type="submit" value="Submit" />
-      </form>
+    <div id="blog-posts">
+      <div id="blog-post-101" class="blog-post">
+        <h3>Blog Post 101</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed scelerisque nunc malesuada mauris fermentum commodo. Integer non pellentesque augue, vitae pellentesque tortor. Ut gravida ullamcorper dolor, ac fringilla mauris interdum id. Nulla porta egestas nisi, et eleifend nisl tincidunt suscipit. Suspendisse massa ex, fringilla quis orci a, rhoncus porta nulla. Aliquam diam velit, bibendum sit amet suscipit eget, mollis in purus. Sed mattis ultricies scelerisque. Integer ligula magna, feugiat non purus eget, pharetra volutpat orci. Duis gravida neque erat, nec venenatis dui dictum vel. Maecenas molestie tortor nec justo porttitor, in sagittis libero consequat. Maecenas finibus porttitor nisl vitae tincidunt.</p>
+      </div>
+      <div id="blog-post-102" class="blog-post">
+        <h3>Blog Post 102</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed scelerisque nunc malesuada mauris fermentum commodo. Integer non pellentesque augue, vitae pellentesque tortor. Ut gravida ullamcorper dolor, ac fringilla mauris interdum id. Nulla porta egestas nisi, et eleifend nisl tincidunt suscipit. Suspendisse massa ex, fringilla quis orci a, rhoncus porta nulla. Aliquam diam velit, bibendum sit amet suscipit eget, mollis in purus. Sed mattis ultricies scelerisque. Integer ligula magna, feugiat non purus eget, pharetra volutpat orci. Duis gravida neque erat, nec venenatis dui dictum vel. Maecenas molestie tortor nec justo porttitor, in sagittis libero consequat. Maecenas finibus porttitor nisl vitae tincidunt.</p>
+      </div>
+      <div id="blog-post-103" class="blog-post">
+        <h3>Blog Post 103</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed scelerisque nunc malesuada mauris fermentum commodo. Integer non pellentesque augue, vitae pellentesque tortor. Ut gravida ullamcorper dolor, ac fringilla mauris interdum id. Nulla porta egestas nisi, et eleifend nisl tincidunt suscipit. Suspendisse massa ex, fringilla quis orci a, rhoncus porta nulla. Aliquam diam velit, bibendum sit amet suscipit eget, mollis in purus. Sed mattis ultricies scelerisque. Integer ligula magna, feugiat non purus eget, pharetra volutpat orci. Duis gravida neque erat, nec venenatis dui dictum vel. Maecenas molestie tortor nec justo porttitor, in sagittis libero consequat. Maecenas finibus porttitor nisl vitae tincidunt.</p>
+      </div>
     </div>
 
     <div id="spinner">
       <img src="spinner.gif" width="50" height="50" />
     </div>
 
-    <div id="result">
-      <p>The total volume is: <span id="volume"></span></p>
+    <div id="load-more-container">
+      <button id="load-more">Load more</button>
     </div>
 
     <script>
 
-      var result_div = document.getElementById("result");
-      var volume = document.getElementById("volume");
-      var button = document.getElementById("html-submit");
-      var orig_button_value = button.value;
+      var container = document.getElementById('blog-posts');
+      var load_more = document.getElementById('load-more');
 
       function showSpinner() {
         var spinner = document.getElementById("spinner");
@@ -55,73 +56,21 @@
         spinner.style.display = 'none';
       }
 
-      function disableSubmitButton() {
-        button.disabled = true;
-        button.value = 'Loading...';
+      function showLoadMore() {
+        load_more.style.display = 'inline';
       }
 
-      function enableSubmitButton() {
-        button.disabled = false;
-        button.value = orig_button_value;
+      function hideLoadMore() {
+        load_more.style.display = 'none';
       }
 
-      function displayErrors(errors) {
-        var inputs = document.getElementsByTagName('input');
-        for(i=0; i < inputs.length; i++) {
-          var input = inputs[i];
-          if(errors.indexOf(input.name) >= 0) {
-            input.classList.add('error');
-          }
-        }
-      }
+      function loadMore() {
 
-      function clearErrors() {
-        var inputs = document.getElementsByTagName('input');
-        for(i=0; i < inputs.length; i++) {
-          inputs[i].classList.remove('error');
-        }
-      }
-
-      function postResult(value) {
-        volume.innerHTML = value;
-        result_div.style.display = 'block';
-      }
-
-      function clearResult() {
-        volume.innerHTML = '';
-        result_div.style.display = 'none';
-      }
-
-      // omits textareas, select-options, checkboxes, radio buttons
-      function gatherFormData(form) {
-        var inputs = form.getElementsByTagName('input');
-        var array = [];
-        for(i=0; i < inputs.length; i++) {
-          var inputNameValue = inputs[i].name + '=' + inputs[i].value;
-          array.push(inputNameValue);
-        }
-        return array.join('&');
-      }
-
-      function calculateMeasurements() {
-        clearResult();
-        clearErrors();
         showSpinner();
-        disableSubmitButton();
-
-        var form = document.getElementById("measurement-form");
-        var action = form.getAttribute("action");
-
-        // gather form data
-        var form_data = new FormData(form);
-        for ([key, value] of form_data.entries()) {
-          console.log(key + ': ' + value);
-        }
+        hideLoadMore();
 
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', action, true);
-        // do not set content-type with FormData
-        //xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.open('GET', 'blog_posts.php?page=1', true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.onreadystatechange = function () {
           if(xhr.readyState == 4 && xhr.status == 200) {
@@ -129,24 +78,18 @@
             console.log('Result: ' + result);
 
             hideSpinner();
-            enableSubmitButton();
+            // append results to end of blog posts
+            showLoadMore();
 
-            var json = JSON.parse(result);
-            if(json.hasOwnProperty('errors') && json.errors.length > 0) {
-              displayErrors(json.errors);
-            } else {
-              postResult(json.volume);
-            }
           }
         };
-        xhr.send(form_data);
+        xhr.send();
       }
 
-      button.addEventListener("click", function(event) {
-        event.preventDefault();
-        calculateMeasurements();
-      });
+      load_more.addEventListener("click", loadMore);
 
+      // Load even the first page with Ajax
+      loadMore();
     </script>
 
   </body>
