@@ -56,17 +56,14 @@
         spinner.style.display = 'none';
       }
 
-
       function disableSubmitButton() {
-
-          button.disabled = true;
-          button.value = 'Loading...';
+        button.disabled = true;
+        button.value = 'Loading...';
       }
 
       function enableSubmitButton() {
-
-          button.disabled = false;
-          button.value = orig_button_value;
+        button.disabled = false;
+        button.value = orig_button_value;
       }
 
       function displayErrors(errors) {
@@ -113,9 +110,6 @@
         showSpinner();
         disableSubmitButton();
 
-
-          button.disabled = true;
-
         var form = document.getElementById("measurement-form");
         var action = form.getAttribute("action");
 
@@ -148,7 +142,6 @@
         };
         xhr.send(form_data);
       }
-
 
       button.addEventListener("click", calculateMeasurements);
 
