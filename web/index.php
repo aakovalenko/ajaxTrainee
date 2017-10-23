@@ -2,4 +2,4 @@
 
 echo 'hi';
 
-echo "<a href='../common/directory.php'>";
+echo "<a href='common/directory.php'>";
