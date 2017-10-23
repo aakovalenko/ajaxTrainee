@@ -1,8 +1,5 @@
+<?php
 
-<?php include('includes/header.php'); ?>
+echo 'hi';
 
-  <div id="page-content">
-    <h1>Main page</h1>
-  </div>
-
-<?php include('includes/footer.php'); ?>
+echo "<a href='../common/directory.php'>";
